@@ -1,180 +1,93 @@
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIKAS SINGH | STARK MISSION CONTROL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>Live World News</title>
     <style>
-        :root {
-            --stark-blue: #00f2ff;
-            --stark-red: #ff3c00;
-            --bg-dark: #050505;
-        }
-
         body {
-            background-color: var(--bg-dark);
-            color: var(--stark-blue);
-            font-family: 'Share Tech Mono', monospace;
-            margin: 0;
-            padding: 10px;
-            overflow-x: hidden;
-        }
-
-        /* Top Header Area */
-        .header {
-            border-bottom: 2px solid var(--stark-blue);
-            padding: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0, 242, 255, 0.05);
-        }
-
-        .master-tag {
+            font-family: Arial, sans-serif;
+            background: #111;
             color: white;
-            background: var(--stark-red);
-            padding: 2px 8px;
-            font-family: 'Orbitron';
-            font-size: 0.8rem;
+            text-align: center;
         }
-
-        /* Main Layout Grid */
-        .dashboard-container {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 15px;
+        h1 {
+            color: #00ffcc;
         }
-
-        .panel {
-            border: 1px solid var(--stark-blue);
-            background: rgba(0, 242, 255, 0.02);
+        select, button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .news-container {
+            margin-top: 20px;
+            width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .news-item {
+            background: #222;
             padding: 15px;
-            border-radius: 5px;
-            box-shadow: inset 0 0 15px rgba(0, 242, 255, 0.1);
+            margin: 10px 0;
+            border-radius: 8px;
         }
-
-        /* Video Section */
-        .video-panel {
-            grid-column: span 2;
-            border-color: var(--stark-red);
+        a {
+            color: #00ffcc;
+            text-decoration: none;
         }
-
-        .video-box {
-            position: relative;
-            padding-bottom: 45%; /* Cinematic Wide */
-            height: 0;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .video-box iframe {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;
-        }
-
-        /* NASA Image */
-        #nasa-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border: 1px solid var(--stark-blue);
-            margin-top: 10px;
-        }
-
-        .grok-box {
-            color: #ffcc00;
-            border-left: 3px solid var(--stark-red);
-            padding-left: 10px;
-            font-style: italic;
-        }
-
-        h2 { font-family: 'Orbitron'; font-size: 1rem; margin-top: 0; color: var(--stark-blue); }
-        .data-big { font-size: 2.5rem; font-weight: bold; }
-        .status-blink { height: 8px; width: 8px; background: #0f0; border-radius: 50%; display: inline-block; animation: blink 1s infinite; }
-        
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div>
-            <span class="master-tag">PATRON: VIKAS SINGH</span>
-            <h1 style="margin:5px 0 0 0; font-family: 'Orbitron'; font-size: 1.5rem;">STARK INDUSTRIES HUB</h1>
-        </div>
-        <div style="text-align: right;">
-            <div id="clock" style="font-size: 1.2rem; font-weight: bold;">00:00:00</div>
-            <small>UPLINK: ACTIVE <span class="status-blink"></span></small>
-        </div>
-    </div>
+<h1>🌍 Live World News (Google से जुड़ा हुआ)</h1>
 
-    <div class="dashboard-container">
-        
-        <div class="column">
-            <div class="panel" style="margin-bottom: 15px;">
-                <h2>🛰️ NASA TELEMETRY</h2>
-                <div id="nasa-title" style="font-size: 0.8rem; color: #fff;">Syncing...</div>
-                <img id="nasa-img" src="" alt="NASA Feed">
-            </div>
+<select id="country">
+    <option value="IN">India</option>
+    <option value="US">USA</option>
+    <option value="GB">UK</option>
+    <option value="PK">Pakistan</option>
+    <option value="CN">China</option>
+</select>
 
-            <div class="panel">
-                <h2>🌡️ BRINDABAN CORE SENSORS</h2>
-                <div class="data-big" id="temp-val">--°C</div>
-                <p style="font-size: 0.7rem;">ATMOSPHERIC DATA: VERIFIED</p>
-            </div>
-        </div>
+<button onclick="getNews()">🔄 News Refresh करें</button>
 
-        <div class="column">
-            <div class="panel" style="height: 100%; box-sizing: border-box;">
-                <h2>🤖 GROK AI TACTICAL BRIEFING</h2>
-                <div class="grok-box">
-                    <p id="grok-text">Awaiting satellite handshake... Decrypting Jarvis logs...</p>
+<div class="news-container" id="news"></div>
+
+<script>
+function getNews() {
+    let country = document.getElementById("country").value;
+    
+    let rssUrl = `https://news.google.com/rss?hl=en-${country}&gl=${country}&ceid=${country}:en`;
+    let apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+    fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+        let newsDiv = document.getElementById("news");
+        newsDiv.innerHTML = "";
+
+        data.items.slice(0, 10).forEach(item => {
+            newsDiv.innerHTML += `
+                <div class="news-item">
+                    <h3>${item.title}</h3>
+                    <p>${item.pubDate}</p>
+                    <a href="${item.link}" target="_blank">पूरा पढ़ें</a>
                 </div>
-                <hr style="border: 0.5px solid #333; margin: 20px 0;">
-                <p style="font-size: 0.8rem; color: #888;">
-                    MASTER: Vikas Singh<br>
-                    LOCATION: Brindaban, India<br>
-                    SYSTEM: Satellite 2.0 (Grok-Enabled)
-                </p>
-            </div>
-        </div>
+            `;
+        });
+    })
+    .catch(error => {
+        document.getElementById("news").innerHTML = "❌ डेटा लोड नहीं हो पाया। इंटरनेट चेक करें।";
+    });
+}
 
-        <div class="panel video-panel">
-            <h2>🔴 LIVE SATELLITE FEED: NASA TV / INTERVIEWS</h2>
-            <div class="video-box">
-                <iframe src="https://www.youtube.com/embed/21X5lGlDOfg?autoplay=1&mute=1&rel=0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                </iframe>
-            </div>
-        </div>
+// Page Load पर अपने आप News आए
+getNews();
 
-    </div>
+// हर 5 मिनट में ऑटो अपडेट
+setInterval(getNews, 300000);
+</script>
 
-    <script>
-        async function updateDashboard() {
-            try {
-                const response = await fetch('satellite_data.json');
-                const data = await response.json();
-
-                document.getElementById('temp-val').innerText = data.temp + "°C";
-                document.getElementById('grok-text').innerText = data.grok_msg;
-                document.getElementById('nasa-title').innerText = data.nasa_title;
-                document.getElementById('nasa-img').src = data.nasa_img;
-            } catch (e) {
-                console.log("Sync in progress...");
-            }
-        }
-
-        function runClock() {
-            const time = new Date().toLocaleTimeString();
-            document.getElementById('clock').innerText = time;
-        }
-
-        setInterval(updateDashboard, 5000); // Har 5 second mein refresh
-        setInterval(runClock, 1000);
-        updateDashboard();
-    </script>
 </body>
 </html>
